@@ -302,10 +302,34 @@ public class Main {
 
     public int coinChange(int[] coins, int amount) {
         if (coins == null || coins.length == 0) {
-
+            return -1;
         }
-        // 定义 dp[i][j]为用前 [0,1,...,i-1] 个硬币来凑成 amount 需要的最少硬币个数
 
+        // 定义 dp[i][j]为用前 [0,1,...,i-1] 个硬币来凑成 amount 需要的最少硬币个数
+        int[][] dp = new int[coins.length + 1][amount + 1];
+        dp[0][0] = 0;
+        for (int j = 1; j < dp[0].length; j++) {
+            dp[0][j] = Integer.MAX_VALUE;
+        }
+
+        for (int i = 1; i <= coins.length; i++) {
+            int coin = coins[i - 1];
+            for (int j = 0; j <= amount; j++) {
+                // coin 的值撑爆背包容量，一定不会选
+                if (j < coin) {
+                    dp[i][j] = dp[i - 1][j];
+                } else {
+                    // 没有一种包含硬币 coin 的选法使得能让硬币凑出 j-coin，所以当前硬币也选不了
+                    if (dp[i][j - coin] == Integer.MAX_VALUE) {
+                        dp[i][j] = dp[i - 1][j];
+                    } else {
+                        dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - coin] + 1);
+                    }
+                }
+            }
+        }
+
+        return dp[coins.length][amount] == Integer.MAX_VALUE ? -1 : dp[coins.length][amount];
     }
 
     public static void main(String[] args) {
