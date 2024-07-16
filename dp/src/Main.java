@@ -301,6 +301,10 @@ public class Main {
     }
 
     public int coinChange(int[] coins, int amount) {
+        if (coins == null || coins.length == 0) {
+
+        }
+        // 定义 dp[i][j]为用前 [0,1,...,i-1] 个硬币来凑成 amount 需要的最少硬币个数
 
     }
 
