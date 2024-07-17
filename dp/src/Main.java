@@ -1,4 +1,5 @@
-import java.util.Arrays;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     public int fib(int n) {
@@ -332,8 +333,101 @@ public class Main {
         return dp[coins.length][amount] == Integer.MAX_VALUE ? -1 : dp[coins.length][amount];
     }
 
+    public int numSquares(int n) {
+        if (n < 0) {
+            return -1;
+        } else if (n == 0) {
+            return 1;
+        }
+
+        // 定义 dp[i][j]为用[0,1,2,...,i]的平方这些数字组成 n 最少需要多少个
+        int line = 0;
+        while (line * line < n) {
+            line++;
+        }
+
+        int[][] dp = new int[line + 1][n + 1];
+        Arrays.fill(dp[0], Integer.MAX_VALUE);
+        dp[0][0] = 0;
+
+        for (int i = 1; i <= line; i++) {
+            for (int j = 0; j <= n; j++) {
+                int cnt = i * i;
+                if (cnt > j) {
+                    dp[i][j] = dp[i - 1][j];
+                } else {
+                    dp[i][j] = Math.min(dp[i][j - cnt] == Integer.MAX_VALUE ? Integer.MAX_VALUE : dp[i][j - cnt] + 1, dp[i - 1][j]);
+                }
+            }
+        }
+
+        return dp[line][n];
+    }
+
+    public boolean wordBreak(String s, List<String> wordDict) {
+        if (s == null || s.length() == 0 || wordDict == null || wordDict.size() == 0) {
+            return false;
+        }
+        Set<String> set = wordDict.stream().collect(Collectors.toSet());
+
+        // 定义 dp[i][j]为用wordDict中的[0,1,...,i]排列能否组成 s[0,j)
+        boolean[][] dp = new boolean[set.size() + 1][s.length() + 1];
+        dp[0][0] = true;
+
+        for (int j = 0; j <= s.length(); j++) {
+            for (int i = 1; i <= wordDict.size(); i++) {
+                String word = wordDict.get(i - 1);
+
+                if (word.length() > j) {
+                    dp[i][j] = dp[i - 1][j];
+                } else {
+                    dp[i][j] = (dp[wordDict.size()][j - word.length()] && set.contains(s.substring(j - word.length(), j))) || dp[i - 1][j];
+                }
+            }
+        }
+
+        return dp[wordDict.size()][s.length()];
+    }
+
+    // 打家劫舍
+    public int rob1(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        dp[1] = Math.max(dp[0], nums[1]);
+        for (int i = 2; i < nums.length; i++) {
+            dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
+        }
+
+        return dp[nums.length - 1];
+    }
+
+    // 打家劫舍 2
+    public int rob2(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        if (nums.length == 1) {
+            return nums[0];
+        }
+        // 这个工具类没有想的那么简单。。。,用了会出错。。。
+//        int[] nums1 = Arrays.copyOfRange(nums, 0, nums.length-1);
+//        int[] nums2 = Arrays.copyOfRange(nums, 1, nums1.length + 1);
+        int[] nums1 = new int[nums.length - 1];
+        for (int i = 0; i < nums.length - 1; i++) {
+            nums1[i] = nums[i];
+        }
+        int[] nums2 = new int[nums.length - 1];
+        for (int i = 1; i < nums.length; i++) {
+            nums2[i - 1] = nums[i];
+        }
+        return Math.max(rob1(nums1), rob1(nums2));
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
-        System.out.println(main.findTargetSumWays(new int[]{0}, 0));
+        main.rob2(new int[]{2, 3, 2});
     }
 }
