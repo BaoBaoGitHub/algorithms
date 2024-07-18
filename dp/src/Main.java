@@ -426,6 +426,51 @@ public class Main {
         return Math.max(rob1(nums1), rob1(nums2));
     }
 
+    private Map<TreeNode, Integer> map = new HashMap<>();
+
+    public int rob3(TreeNode root){
+        if(root ==null){
+            return 0;
+        }
+
+        return rob3PostOrder(root);
+    }
+
+    public int rob3PostOrder(TreeNode root) {
+        // 终止条件
+        if (root == null) {
+            return 0;
+        }
+        if (root.left == null && root.right == null) {
+            map.put(root, root.val);
+            return root.val;
+        }
+
+        // 有保存当前节点的状态
+        if (map.containsKey(root)) {
+            return map.get(root);
+        }
+
+        // 单层递归
+        // 偷当前节点
+        int touLeft = 0;
+        if (root.left != null) {
+            touLeft = rob3PostOrder(root.left.left) + rob3PostOrder(root.left.right);
+        }
+        int touRight = 0;
+        if (root.right != null) {
+            touRight = rob3PostOrder(root.right.left) + rob3PostOrder(root.right.right);
+        }
+        int touCur = touLeft + touRight + root.val;
+
+        // 不偷当前节点
+        int butouCur = rob3PostOrder(root.left) + rob3PostOrder(root.right);
+        int res = Math.max(touCur, butouCur);
+        map.put(root, res);
+
+        return res;
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
         main.rob2(new int[]{2, 3, 2});
