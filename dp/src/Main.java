@@ -428,8 +428,8 @@ public class Main {
 
     private Map<TreeNode, Integer> map = new HashMap<>();
 
-    public int rob3(TreeNode root){
-        if(root ==null){
+    public int rob3(TreeNode root) {
+        if (root == null) {
             return 0;
         }
 
@@ -469,6 +469,82 @@ public class Main {
         map.put(root, res);
 
         return res;
+    }
+
+    public int maxProfit1(int[] prices) {
+        if (prices == null || prices.length == 0) {
+            return 0;
+        }
+        // 定义 dp[i][0]和 dp[i][1] 为第[i]天持有/不持有股票的利润
+        int[][] dp = new int[prices.length][2];
+        dp[0][0] = -prices[0];
+
+        for (int i = 1; i < prices.length; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], -prices[i]);
+            dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] + prices[i]);
+        }
+
+        return dp[prices.length - 1][1];
+    }
+
+    public int maxProfit2(int[] prices) {
+        if (prices == null || prices.length == 0) {
+            return 0;
+        }
+        // 定义 dp[i][0]和 dp[i][1] 为第[i]天持有/不持有股票的利润
+        int[][] dp = new int[prices.length][2];
+        dp[0][0] = -prices[0];
+
+        for (int i = 1; i < prices.length; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] - prices[i]);
+            dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] + prices[i]);
+        }
+
+        return dp[prices.length - 1][1];
+    }
+
+    public int maxProfit3(int[] prices) {
+        if (prices == null || prices.length == 0) {
+            return 0;
+        }
+
+        // 定义 dp[i][0] 和 dp[i][1] 为第[i]天第一次持有/不持有股票的利润
+        // 定义 dp[i][2] 和 dp[i][3] 为第[i]天第二次持有/不持有股票的利润
+        int[][] dp = new int[prices.length][4];
+        dp[0][0] = -prices[0];
+        dp[0][2] = -prices[0];
+
+        for (int i = 1; i < prices.length; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], -prices[i]);
+            dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] + prices[i]);
+            dp[i][2] = Math.max(dp[i - 1][2], dp[i - 1][1] - prices[i]);
+            dp[i][3] = Math.max(dp[i - 1][3], dp[i - 1][2] + prices[i]);
+        }
+
+        return dp[prices.length - 1][3];
+    }
+
+    // 要是真碰到这个题，建议跳过
+    // 脑子都快烧了。。。磨了快一小时才
+    public int maxProfit4(int k, int[] prices) {
+        if (prices == null || prices.length == 0 || k <= 0) {
+            return 0;
+        }
+
+        int[][][] dp = new int[prices.length + 1][k + 1][2];
+        for (int i = 1; i <= k; i++) {
+            dp[0][i][0] = -prices[0];
+        }
+
+        for (int i = 1; i <= prices.length; i++) {
+            int price = prices[i - 1];
+            for (int j = 1; j <= k; j++) {
+                dp[i][j][0] = Math.max(dp[i - 1][j][0], dp[i - 1][j - 1][1] - price);
+                dp[i][j][1] = Math.max(dp[i - 1][j][1], dp[i - 1][j][0] + price);
+            }
+        }
+
+        return dp[prices.length][k][1];
     }
 
     public static void main(String[] args) {
