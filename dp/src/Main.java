@@ -547,6 +547,133 @@ public class Main {
         return dp[prices.length][k][1];
     }
 
+    public int lengthOfLIS(int[] nums) {
+        // 定义 dp「i」是以 nums【i】结尾的最长递增子序列的长度
+        int[] dp = new int[nums.length];
+        Arrays.fill(dp, 1);
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+        }
+
+        int res = 0;
+        for (int num : dp) {
+            if (num > res) {
+                res = num;
+            }
+        }
+        return res;
+    }
+
+    public int findLengthOfLCIS(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        int[] dp = new int[nums.length];
+        Arrays.fill(dp, 1);
+
+        for (int i = 1; i < dp.length; i++) {
+            if (nums[i] > nums[i - 1]) {
+                dp[i] = dp[i - 1] + 1;
+            }
+        }
+
+        int res = 0;
+        for (int num : dp) {
+            if (num > res) {
+                res = num;
+            }
+        }
+        return res;
+    }
+
+    public int findLength(int[] nums1, int[] nums2) {
+        if (nums1 == null || nums1.length == 0 || nums2 == null || nums2.length == 0) {
+            return 0;
+        }
+
+        // dp[i][j]是以 nums1[i]和 nums2[j]结尾的子数组的最长公共子数组
+        int[][] dp = new int[nums1.length][nums2.length];
+        for (int j = 0; j < dp[0].length; j++) {
+            if (nums1[0] == nums2[j]) {
+                dp[0][j] = 1;
+            }
+        }
+        for (int i = 0; i < dp.length; i++) {
+            if (nums1[i] == nums2[0]) {
+                dp[i][0] = 1;
+            }
+        }
+
+        for (int i = 1; i < nums1.length; i++) {
+            for (int j = 1; j < nums2.length; j++) {
+                if (nums1[i] == nums2[j]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                }
+            }
+        }
+
+        int res = 0;
+        for (int[] line : dp) {
+            for (int num : line) {
+                if (num > res) {
+                    res = num;
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public int longestCommonSubsequence(String text1, String text2) {
+        if (text1 == null || text1.length() == 0 || text2 == null || text2.length() == 0) {
+            return 0;
+        }
+
+        int res = 0;
+        // 定义 dp[i][j]是以text1[0,i],text2[0,j]的两个串的公共子串
+        int[][] dp = new int[text1.length()][text2.length()];
+        // 初始化 dp[0][j]
+        boolean flag = false;
+        for (int j = 0; j < text2.length(); j++) {
+            if (flag) {
+                dp[0][j] = 1;
+                continue;
+            }
+            if (text1.charAt(0) == text2.charAt(j)) {
+                dp[0][j] = 1;
+                flag = true;
+            }
+        }
+        flag = false;
+        // 初始化 dp[i][0]
+        for (int i = 0; i < text1.length(); i++) {
+            if (flag) {
+                dp[i][0] = 1;
+                continue;
+            }
+            if (text1.charAt(i) == text2.charAt(0)) {
+                dp[i][0] = 1;
+                flag = true;
+            }
+        }
+        // 更新 dp
+        for (int i = 1; i < text1.length(); i++) {
+            for (int j = 1; j < text2.length(); j++) {
+                if (text1.charAt(i) == text2.charAt(j)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        return dp[text1.length() - 1][text2.length() - 1];
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
         main.rob2(new int[]{2, 3, 2});
