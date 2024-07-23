@@ -674,6 +674,184 @@ public class Main {
         return dp[text1.length() - 1][text2.length() - 1];
     }
 
+    public int maxSubArray(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        int res = dp[0];
+
+        for (int i = 1; i < dp.length; i++) {
+            dp[i] = Math.max(nums[i], nums[i] + dp[i - 1]);
+            res = res > dp[i] ? res : dp[i];
+        }
+
+        return res;
+    }
+
+    public int numDistinct(String s, String t) {
+        if (s == null || s.length() == 0 || t == null || t.length() == 0) {
+            return 0;
+        }
+
+        char[] sCharArray = s.toCharArray();
+        char[] tCharArray = t.toCharArray();
+
+        int[][] dp = new int[sCharArray.length + 1][tCharArray.length + 1];
+        // 注意 dp 和 charArray 差一
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = 1;
+        }
+
+        for (int i = 1; i <= sCharArray.length; i++) {
+            for (int j = 1; j <= tCharArray.length; j++) {
+                char si = sCharArray[i - 1];
+                char tj = tCharArray[j - 1];
+
+                if (si == tj) {
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j];
+                } else {
+                    dp[i][j] = dp[i - 1][j];
+                }
+            }
+        }
+
+        return dp[sCharArray.length][tCharArray.length];
+    }
+
+//    public int minDistance(String word1, String word2) {
+//        if (word1 == null || word1.length() == 0 || word2 == null || word2.length() == 0) {
+//            return 0;
+//        }
+//
+//        int[][] dp = new int[word1.length() + 1][word2.length() + 1];
+//        for (int j = 0; j < dp[0].length; j++) {
+//            dp[0][j] = j;
+//        }
+//        for (int i = 0; i < dp.length; i++) {
+//            dp[i][0] = i;
+//        }
+//
+//        for (int i = 1; i <= word1.length(); i++) {
+//            for (int j = 1; j <= word2.length(); j++) {
+//                char c1 = word1.charAt(i - 1);
+//                char c2 = word2.charAt(j - 1);
+//                if (c1 == c2) {
+//                    dp[i][j] = dp[i - 1][j - 1];
+//                } else {
+//                    dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + 1;
+//                }
+//            }
+//        }
+//
+//        return dp[word1.length()][word2.length()];
+//    }
+
+    // 编辑距离
+    public int minDistance(String word1, String word2) {
+        if (word1 == null || word2 == null) {
+            return 0;
+        }
+        if (word1.length() == 0) {
+            return word2.length();
+        }
+        if (word2.length() == 0) {
+            return word1.length();
+        }
+
+        int[][] dp = new int[word1.length() + 1][word2.length() + 1];
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j < dp[0].length; j++) {
+            dp[0][j] = j;
+        }
+
+        for (int i = 1; i <= word1.length(); i++) {
+            for (int j = 1; j <= word2.length(); j++) {
+                char si = word1.charAt(i - 1);
+                char tj = word2.charAt(j - 1);
+                if (si == tj) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    int min = Math.min(dp[i - 1][j], dp[i][j - 1]);
+                    min = Math.min(min, dp[i - 1][j - 1]);
+                    min += 1;
+
+                    dp[i][j] = min;
+                }
+            }
+        }
+
+        return dp[word1.length()][word2.length()];
+    }
+
+    public int countSubstrings(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        } else if (s.length() == 1) {
+            return 1;
+        }
+
+        int res = 0;
+        boolean[][] dp = new boolean[s.length()][s.length()];
+        // 初始化
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][i] = true;
+            res++;
+            if (i + 1 < dp[0].length && s.charAt(i) == s.charAt(i + 1)) {
+                dp[i][i + 1] = true;
+                res++;
+            }
+        }
+
+        // 推倒 dp
+        for (int i = dp.length - 1; i >= 0; i--) {
+            for (int j = i + 2; j < dp[0].length; j++) {
+                if (s.charAt(i) == s.charAt(j)) {
+                    dp[i][j] = dp[i + 1][j - 1];
+                    if (dp[i][j]) {
+                        res++;
+                    }
+                } else {
+                    dp[i][j] = false;
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public int longestPalindromeSubseq(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        } else if (s.length() == 1) {
+            return 1;
+        }
+
+        int[][] dp = new int[s.length()][s.length()];
+        for (int i = dp.length - 1; i >= 0; i--) {
+            for (int j = i; j < dp.length; j++) {
+                if (s.charAt(i) == s.charAt(j)) {
+                    if (i == j) {
+                        dp[i][j] = 1;
+                    } else if (i + 1 == j) {
+                        dp[i][j] = 2;
+                    } else {
+                        dp[i][j] = dp[i + 1][j - 1] + 2;
+                    }
+                } else {
+                    dp[i][j] = Math.max(dp[i + 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        return dp[0][s.length() - 1];
+    }
+
+
     public static void main(String[] args) {
         Main main = new Main();
         main.rob2(new int[]{2, 3, 2});
